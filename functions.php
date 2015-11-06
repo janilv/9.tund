@@ -1,4 +1,15 @@
 <?php
+	
+	require_once("../configglobal.php");
+	require_once("User.class.php")
+	
+	$database = "if15_janilv";
+	
+	session_start();
+	
+	//loome ab ühenduse
+	
+	/*
 	//kõik AB'iga seonduv
 	
 	// ühenduse loomiseks kasuta
