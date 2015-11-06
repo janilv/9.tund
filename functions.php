@@ -1,20 +1,42 @@
 <?php
-	
 	require_once("../configglobal.php");
-	require_once("User.class.php")
+	require_once("User.class.php");
 	
 	$database = "if15_janilv";
 	
 	session_start();
 	
-	//loome ab ühenduse
+	//loome ab'i ühenduse
+	$mysqli = new mysqli($servername, $server_username, $server_password, $database);
+	
+	//Uus instants klassist User
+	$User = new User($mysqli);
+	
+	//var_dump($User->connection);
+	
+	
+	
+	/*$name  = "Juku";
+	
+	$welcome = hello($name);
+	
+	function hello($name){
+		
+		$welcome = "Tere ".$name;
+		
+		return $welcome;
+		
+	}
+	
+	echo $welcome;
+	*/
 	
 	/*
 	//kõik AB'iga seonduv
 	
 	// ühenduse loomiseks kasuta
 	require_once("../configglobal.php");
-	$database = "if15_janilv";
+	$database = "if15_romil_2";
 	
 	// paneme sessiooni käima, saame kasutada $_SESSION muutujaid
 	session_start();
@@ -65,7 +87,6 @@
 		$mysqli = new mysqli($GLOBALS["servername"], $GLOBALS["server_username"], $GLOBALS["server_password"], $GLOBALS["database"]);
 		
 		$stmt = $mysqli->prepare("INSERT INTO car_plates (user_id, number_plate, color) VALUES (?, ?, ?)");
-		echo $mysqli->error;
 		$stmt->bind_param("iss", $_SESSION["id_from_db"], $car_plate, $color);
 		
 		$message = "";
@@ -94,11 +115,11 @@
 		return $string;
 		
 		// mis on pärast returni seda ei käivitata
-		echo "hello";
+		echo "hellooooo";
 		
 	}
 	
-	$str = welcome("Jan");
+	$str = welcome("Romil");
 	
 	echo $str;
 	

@@ -13,7 +13,7 @@
 	$password_error = "";
 	$create_email_error = "";
 	$create_password_error = "";
-  // muutujad v‰‰rtuste jaoks
+  // muutujad v√§√§rtuste jaoks
 	$email = "";
 	$password = "";
 	$create_email = "";
@@ -24,24 +24,47 @@
     // *********************
 		if(isset($_POST["login"])){
 			if ( empty($_POST["email"]) ) {
-				$email_error = "See v‰li on kohustuslik";
+				$email_error = "See v√§li on kohustuslik";
 			}else{
-        // puhastame muutuja vıimalikest ¸leliigsetest s¸mbolitest
+        // puhastame muutuja v√µimalikest √ºleliigsetest s√ºmbolitest
 				$email = cleanInput($_POST["email"]);
 			}
 			if ( empty($_POST["password"]) ) {
-				$password_error = "See v‰li on kohustuslik";
+				$password_error = "See v√§li on kohustuslik";
 			}else{
 				$password = cleanInput($_POST["password"]);
 			}
-      // Kui oleme siia jıudnud, vıime kasutaja sisse logida
+      // Kui oleme siia j√µudnud, v√µime kasutaja sisse logida
 			if($password_error == "" && $email_error == ""){
-				echo "Vıib sisse logida! Kasutajanimi on ".$email." ja parool on ".$password;
+				echo "V√µib sisse logida! Kasutajanimi on ".$email." ja parool on ".$password;
 				
 				$password_hash = hash("sha512", $password);
 				
-				// functions php failis k‰ivitan funktsiooni
-				loginUser($email, $password_hash);
+				// User klassi sees olev funktsioon
+				$login_response = $User->loginUser($email, $password_hash);
+				
+				//kasutaja on sisse logitud
+				if(isset($login_response->success)){
+					
+					//echo "<pre>";
+					//var_dump($login_response);
+					//echo "</pre>";
+					// l√§ks edukalt, n√º√ºd peaks kasutaja sessiooni salvestama
+					$_SESSION["id_from_db"] = $login_response->success->user->id;
+					$_SESSION["user_email"] = $login_response->success->user->email;
+					
+					header("Location: data.php");
+					
+					//******************************
+					//********* OLULINE ************
+					//******************************
+					
+					// l√µpetame PHP laadimise
+					exit();
+					
+					
+				}
+				
 			}
 		} // login if end
     // *********************
@@ -49,33 +72,33 @@
     // *********************
     if(isset($_POST["create"])){
 			if ( empty($_POST["create_email"]) ) {
-				$create_email_error = "See v‰li on kohustuslik";
+				$create_email_error = "See v√§li on kohustuslik";
 			}else{
 				$create_email = cleanInput($_POST["create_email"]);
 			}
 			if ( empty($_POST["create_password"]) ) {
-				$create_password_error = "See v‰li on kohustuslik";
+				$create_password_error = "See v√§li on kohustuslik";
 			} else {
 				if(strlen($_POST["create_password"]) < 8) {
-					$create_password_error = "Peab olema v‰hemalt 8 t‰hem‰rki pikk!";
+					$create_password_error = "Peab olema v√§hemalt 8 t√§hem√§rki pikk!";
 				}else{
 					$create_password = cleanInput($_POST["create_password"]);
 				}
 			}
 			if(	$create_email_error == "" && $create_password_error == ""){
-				echo "Vıib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password;
+				echo "V√µib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password;
 				
 				$password_hash = hash("sha512", $create_password);
 				echo "<br>";
 				echo $password_hash;
 				
-				// functions.php failis k‰ivina funktsiooni
-				createUser($create_email, $password_hash);
+				// User klassi sees olev funktsioon
+				$create_response = $User->createUser($create_email, $password_hash);
 				
 			}
     } // create if end
 	}
-  // funktsioon, mis eemaldab kıikvıimaliku ¸leliigse tekstist
+  // funktsioon, mis eemaldab k√µikv√µimaliku √ºleliigse tekstist
   function cleanInput($data) {
   	$data = trim($data);
   	$data = stripslashes($data);
@@ -93,6 +116,21 @@
 <body>
 
   <h2>Log in</h2>
+  
+  <?php if(isset($login_response->error)): ?>
+  
+	<p style="color:red;">
+		<?=$login_response->error->message;?>
+	</p>
+  
+  <?php elseif(isset($login_response->success)): ?>
+  
+	<p style="color:green;">
+		<?=$login_response->success->message;?>
+	</p>
+  
+  <?php endif; ?>  
+  
   <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" >
   	<input name="email" type="email" placeholder="E-post" value="<?php echo $email; ?>"> <?php echo $email_error; ?><br><br>
   	<input name="password" type="password" placeholder="Parool" value="<?php echo $password; ?>"> <?php echo $password_error; ?><br><br>
@@ -100,6 +138,21 @@
   </form>
 
   <h2>Create user</h2>
+  
+  <?php if(isset($create_response->error)): ?>
+  
+	<p style="color:red;">
+		<?=$create_response->error->message;?>
+	</p>
+  
+  <?php elseif(isset($create_response->success)): ?>
+  
+	<p style="color:green;">
+		<?=$create_response->success->message;?>
+	</p>
+  
+  <?php endif; ?>  
+  
   <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" >
   	<input name="create_email" type="email" placeholder="E-post" value="<?php echo $create_email; ?>"> <?php echo $create_email_error; ?><br><br>
   	<input name="create_password" type="password" placeholder="Parool"> <?php echo $create_password_error; ?> <br><br>
